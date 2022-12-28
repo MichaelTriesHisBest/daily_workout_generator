@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import psycopg2
 import argparse
+import time
 
 load_dotenv()
 
@@ -55,6 +56,7 @@ def insert_workout_and_sets(workout: str, reps: int):
     connection.close()
     print(f"Inserted Workout : {workout} and Reps : {reps} into table")
     
+    
 def sum_workouts():
     connection = connect_to_db()
     curs = connection.cursor()
@@ -63,17 +65,54 @@ def sum_workouts():
         print(str(record))
     connection.close()
     
+    
+def start_instance():
+    rds = boto3.client('rds', region_name=REGION)
+    response = rds.start_db_instance(DBInstanceIdentifier=IDENTIFIER)
+    print(str(response))
+    
+
+def describe_instance():
+    rds = boto3.client('rds', region_name=REGION)
+    response = rds.describe_db_instances(DBInstanceIdentifier=IDENTIFIER)
+    return response
+
+
+def check_instance_status():
+    response = describe_instance()
+    sleep_interval = 45
+    # instance_state = response['DBInstances']
+    # print(instance_state[0]['DBInstanceStatus'])
+    instance_status = response['DBInstances'][0]['DBInstanceStatus']
+    total_sleep_time = 0
+    while instance_status != 'available':
+        print(f"Instance Status is: {instance_status}, sleeping 15 seconds")
+        time.sleep(sleep_interval)
+        total_sleep_time+= sleep_interval
+        if total_sleep_time > 900:
+            print("Takin way too long bud gl next time")
+            return False
+        response = describe_instance()
+        instance_status = response['DBInstances'][0]['DBInstanceStatus']
+        
+    return True
+    
+def shutdown_instance():
+    rds = boto3.client('rds', region_name=REGION)
+    response = rds.stop_db_instance(DBInstanceIdentifier=IDENTIFIER)
+    return True
+      
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='Changing gross-bods to dad-bods')
-    parser.add_argument('--get_workout', action='store_const', const=True, help='Will retrieve workout and set')
-    parser.add_argument('--sum_workout', action='store_const', const=True, help='Summarizes your workouts so far')
+    parser.add_argument('--get_workout', action='store_true',  help='Will retrieve workout and set')
+    parser.add_argument('--sum_workout', action='store_true',  help='Summarizes your workouts so far')
     args = parser.parse_args()
     
     get_workout = args.get_workout
     sum_workout = args.sum_workout
     
-    
+        
     random_workout = random.choice(list(WORKOUT_DICT.keys()))
     min_range, max_range = WORKOUT_DICT.get(random_workout)
     arbitrary_reps = random.randrange(min_range, max_range)
@@ -82,10 +121,13 @@ if __name__ == "__main__":
     else:
         print(f"Hello! Todays workout will be {random_workout}, which you'll need to do {arbitrary_reps} seconds on each side!")
     try:
-        if get_workout:
-            insert_workout_and_sets(workout=random_workout, reps=arbitrary_reps)
-        elif sum_workout:
-            sum_workouts()
+        start_instance()
+        if check_instance_status():
+            if get_workout:
+                insert_workout_and_sets(workout=random_workout, reps=arbitrary_reps)
+            elif sum_workout:
+                sum_workouts()
+            shutdown_instance()
 
     except Exception as e:
         print(f"L + ratio : {e}")
