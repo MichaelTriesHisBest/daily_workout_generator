@@ -54,7 +54,7 @@ def insert_workout_and_sets(workout: str, reps: int):
     curs.execute("insert into postgres.public.workout_table (workout_name, reps, completed_on) VALUES (%s,%s,now())",(workout, reps))
     connection.commit()
     connection.close()
-    print(f"Inserted Workout : {workout} and Reps : {reps} into table")
+    buffered_print(f"Inserted Workout : {workout} and Reps : {reps} into table")
     
     
 def sum_workouts():
@@ -62,14 +62,14 @@ def sum_workouts():
     curs = connection.cursor()
     curs.execute("select sum(reps), workout_name from postgres.public.workout_table group by workout_name ")
     for record in curs:
-        print(str(record))
+        buffered_print(str(record))
     connection.close()
     
     
 def start_instance():
     rds = boto3.client('rds', region_name=REGION)
     response = rds.start_db_instance(DBInstanceIdentifier=IDENTIFIER)
-    print(str(response))
+    buffered_print(str(response))
     
 
 def describe_instance():
@@ -86,11 +86,11 @@ def check_instance_status():
     instance_status = response['DBInstances'][0]['DBInstanceStatus']
     total_sleep_time = 0
     while instance_status != 'available':
-        print(f"Instance Status is: {instance_status}, sleeping 15 seconds")
+        buffered_print(f"Instance Status is: {instance_status}, sleeping 15 seconds")
         time.sleep(sleep_interval)
         total_sleep_time+= sleep_interval
         if total_sleep_time > 900:
-            print("Takin way too long bud gl next time")
+            buffered_print("Takin way too long bud gl next time")
             return False
         response = describe_instance()
         instance_status = response['DBInstances'][0]['DBInstanceStatus']
@@ -101,7 +101,12 @@ def shutdown_instance():
     rds = boto3.client('rds', region_name=REGION)
     response = rds.stop_db_instance(DBInstanceIdentifier=IDENTIFIER)
     return True
-      
+
+def buffered_print(string: str):
+    for char in string:
+        print(char, end='',flush=True)
+        time.sleep(.1)
+    
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='Changing gross-bods to dad-bods')
@@ -117,9 +122,9 @@ if __name__ == "__main__":
     min_range, max_range = WORKOUT_DICT.get(random_workout)
     arbitrary_reps = random.randrange(min_range, max_range)
     if random_workout != "planking":
-        print(f"Hello! Todays workout will be {random_workout}, which you'll need to do {arbitrary_reps} of!")
+        buffered_print(f"Hello! Todays workout will be {random_workout}, which you'll need to do {arbitrary_reps} of!")
     else:
-        print(f"Hello! Todays workout will be {random_workout}, which you'll need to do {arbitrary_reps} seconds on each side!")
+        buffered_print(f"Hello! Todays workout will be {random_workout}, which you'll need to do {arbitrary_reps} seconds on each side!")
     try:
         start_instance()
         if check_instance_status():
@@ -129,5 +134,5 @@ if __name__ == "__main__":
                 sum_workouts()
             shutdown_instance()
     except Exception as e:
-        print(f"L + ratio : {e}")
+        buffered_print(f"L + ratio : {e}")
         shutdown_instance()
