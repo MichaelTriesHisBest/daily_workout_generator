@@ -9,5 +9,7 @@ Connects to RDS and saves workout + reps so I can summerize and feel decent abou
 - [x] Add workouts and tuples
 - [x] Add readme
 - [x] Setup env variables
-- [] Add RDS connection
+- [x] Add RDS connection
+- [x] Insert workouts into table
+- [] Add ability to stop/start rds instance (to save $$$)
 - [] Add flags
