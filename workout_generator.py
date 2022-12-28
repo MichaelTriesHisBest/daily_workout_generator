@@ -128,7 +128,6 @@ if __name__ == "__main__":
             elif sum_workout:
                 sum_workouts()
             shutdown_instance()
-
     except Exception as e:
         print(f"L + ratio : {e}")
-        
+        shutdown_instance()

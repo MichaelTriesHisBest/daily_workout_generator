@@ -12,5 +12,5 @@ Flag operated, so --get_workout gives you a workout and --sum_workout summerizes
 - [x] Setup env variables
 - [x] Add RDS connection
 - [x] Insert workouts into table
-- [] Add ability to stop/start rds instance (to save $$$)
+- [x] Add ability to stop/start rds instance (to save $$$)
 - [x] Add flags
