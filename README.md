@@ -3,6 +3,7 @@ Helpin me stay in shape with some daily workout check-ins
 ### Description
 Python-based script that randomly selects a workout from a curated list of workouts + reps.
 Connects to RDS and saves workout + reps so I can summerize and feel decent about myself at the end of the year.
+Flag operated, so --get_workout gives you a workout and --sum_workout summerizes your workout.
 
 
 ### TODO list 
@@ -12,4 +13,4 @@ Connects to RDS and saves workout + reps so I can summerize and feel decent abou
 - [x] Add RDS connection
 - [x] Insert workouts into table
 - [] Add ability to stop/start rds instance (to save $$$)
-- [] Add flags
+- [x] Add flags
