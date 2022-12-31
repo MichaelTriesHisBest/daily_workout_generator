@@ -24,7 +24,7 @@ ABDOMINAL_TUPLE = (150,250)
 LEG_WORKOUT_TUPLE = (75, 200)
 CHEST_WORKOUT_TUPLE = (75, 150)
 STAY_AND_HOLD_TUPLE = (150, 280)
-BACK_WORKOUT_TUPLE = (75,125)
+BACK_WORKOUT_TUPLE = (25,35)
 
 # workouit dictionary, can be updated 
 WORKOUT_DICT = {
@@ -69,7 +69,6 @@ def sum_workouts():
 def start_instance():
     rds = boto3.client('rds', region_name=REGION)
     response = rds.start_db_instance(DBInstanceIdentifier=IDENTIFIER)
-    buffered_print(str(response))
     
 
 def describe_instance():
@@ -100,7 +99,7 @@ def check_instance_status():
 def shutdown_instance():
     rds = boto3.client('rds', region_name=REGION)
     response = rds.stop_db_instance(DBInstanceIdentifier=IDENTIFIER)
-    return True
+    print("Shutting down instance!")
 
 def buffered_print(string: str):
     for char in string:
