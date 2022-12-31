@@ -9,11 +9,11 @@ import time
 load_dotenv()
 
 #setting env variables
-port = os.getenv("PORT")
-username = os.getenv("USER")
-password = os.getenv("PASSWORD")
-dbname = os.getenv("DB_NAME")
-endpoint = os.getenv("ENDPOINT")
+PORT = os.getenv("PORT")
+USERNAME = os.getenv("USER")
+PASSWORD = os.getenv("PASSWORD")
+DBNAME = os.getenv("DB_NAME")
+ENDPOINT = os.getenv("ENDPOINT")
 REGION = os.getenv("REGION")
 ACCESS_ID= os.getenv("ACCESS_ID")
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -44,7 +44,7 @@ WORKOUT_DICT = {
 
         
 def connect_to_db():
-    connection = psycopg2.connect(database=dbname, user=username, password=password, host=endpoint, port=port, sslrootcert="SSLCERTIFICATE")
+    connection = psycopg2.connect(database=DBNAME, user=USERNAME, password=PASSWORD, host=ENDPOINT, port=PORT, sslrootcert="SSLCERTIFICATE")
     return connection
 
 
@@ -80,8 +80,6 @@ def describe_instance():
 def check_instance_status():
     response = describe_instance()
     sleep_interval = 45
-    # instance_state = response['DBInstances']
-    # print(instance_state[0]['DBInstanceStatus'])
     instance_status = response['DBInstances'][0]['DBInstanceStatus']
     total_sleep_time = 0
     while instance_status != 'available':
@@ -116,10 +114,10 @@ if __name__ == "__main__":
     get_workout = args.get_workout
     sum_workout = args.sum_workout
     
-        
     random_workout = random.choice(list(WORKOUT_DICT.keys()))
     min_range, max_range = WORKOUT_DICT.get(random_workout)
     arbitrary_reps = random.randrange(min_range, max_range)
+    
     if random_workout != "planking":
         buffered_print(f"Hello! Todays workout will be {random_workout}, which you'll need to do {arbitrary_reps} of!")
     else:
@@ -132,6 +130,7 @@ if __name__ == "__main__":
             elif sum_workout:
                 sum_workouts()
             shutdown_instance()
+            
     except Exception as e:
         buffered_print(f"L + ratio : {e}")
         shutdown_instance()
