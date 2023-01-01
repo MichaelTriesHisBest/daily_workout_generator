@@ -54,7 +54,7 @@ def insert_workout_and_sets(workout: str, reps: int):
     curs.execute("insert into postgres.public.workout_table (workout_name, reps, completed_on) VALUES (%s,%s,now())",(workout, reps))
     connection.commit()
     connection.close()
-    buffered_print(f"Inserted Workout : {workout} and Reps : {reps} into table")
+    print(f"Inserted Workout : {workout} and Reps : {reps} into table")
     
     
 def sum_workouts():
@@ -62,7 +62,7 @@ def sum_workouts():
     curs = connection.cursor()
     curs.execute("select sum(reps), workout_name from postgres.public.workout_table group by workout_name ")
     for record in curs:
-        buffered_print(str(record))
+        print(str(record))
     connection.close()
     
     
@@ -83,7 +83,7 @@ def check_instance_status():
     instance_status = response['DBInstances'][0]['DBInstanceStatus']
     total_sleep_time = 0
     while instance_status != 'available':
-        buffered_print(f"Instance Status is: {instance_status}, sleeping 15 seconds")
+        print(f"Instance Status is: {instance_status}, sleeping for {sleep_interval} seconds")
         time.sleep(sleep_interval)
         total_sleep_time+= sleep_interval
         if total_sleep_time > 900:
@@ -91,7 +91,7 @@ def check_instance_status():
             return False
         response = describe_instance()
         instance_status = response['DBInstances'][0]['DBInstanceStatus']
-        
+    print(f"Took the DB a total of {total_sleep_time} to wake up!")
     return True
     
 def shutdown_instance():
